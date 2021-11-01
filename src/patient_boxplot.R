@@ -1,7 +1,8 @@
 patient_boxplot <- function(metadata,
                             genesig_name,
                             group_colname,
-                            id_colname
+                            id_colname,
+                            img_format
                             # comparisons,
                             # wilcox_direction = 'less'
                             ) {
@@ -35,6 +36,6 @@ genesig_colname = paste0(genesig_name, "_sig_score")
           y='average gene signature score') +
       NoLegend()
 
-  ggsave('./output/patient_boxplot.png')
+ggsave(paste0('./output/patient_boxplot.', img_format)) %>% suppressMessages()
 
 }

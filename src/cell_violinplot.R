@@ -1,6 +1,7 @@
 cell_violinplot <- function(metadata,
                             genesig_name,
-                            group_colname
+                            group_colname,
+                            img_format
                             #  comparisons,
                             #  wilcox_direction="less"
                              ) {
@@ -24,6 +25,6 @@ metadata %>%
         x=NULL,
         y='gene signature score')
 
-ggsave('./output/cell_violinplot.png')
+ggsave(paste0('./output/cell_violinplot.', img_format)) %>% suppressMessages()
 
 }
