@@ -1,9 +1,7 @@
 genesig_UMAP <- function(seurat_obj, 
                          genesig_name,
                          group_colname,
-                         img_format,
-                         fontsize=16, 
-                         percentile_thresh=0.98) {
+                         img_format) {
   
   # UMAP by gene sig activity classification 
   DimPlot(seurat_obj, 
@@ -11,10 +9,10 @@ genesig_UMAP <- function(seurat_obj,
           group.by = paste0(genesig_name, "_active"), 
           order = "active", 
           cols = c("gray", "red"), 
-          pt.size = 0.4,
+          pt.size = 1,
           split.by = group_colname) + 
      ggtitle("Gene signature activity UMAP") +
-    theme_classic(base_size = fontsize) 
+    theme_classic(base_size = 16) 
   
 
 ggsave(paste0('./output/genesig_UMAP.', img_format), width = 12) %>% suppressMessages()

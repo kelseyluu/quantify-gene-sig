@@ -15,7 +15,10 @@ run_AUCell <- function(seurat_obj, geneSet, cells_rankings=NULL) {
   cells_assignment <- AUCell_exploreThresholds(cells_AUC, 
                                                nCores=1, assign=TRUE,
                                                plotHist=FALSE)
-  cat(paste('Optimal threshold:', cells_assignment[[genesig_name]]$aucThr$selected %>% round(4), '\n'))
+  thresh <- cells_assignment[[genesig_name]]$aucThr$selected %>% round(4)
+  active_cells <- cells_assignment[[genesig_name]]$assignment
+  cat(paste('Optimal gene signature threshold:', thresh, '\n'))
+  cat(paste0('Cells passing threshold: ', length(active_cells), ' (', round(100 * length(active_cells) / length(Cells(seurat_obj)), 2), '%)\n'))
 
   # get scores per cell
   genesig_scores <- getAUC(cells_AUC)
@@ -28,7 +31,7 @@ run_AUCell <- function(seurat_obj, geneSet, cells_rankings=NULL) {
   # add genesig binary active status to seurat metadata
   seurat_obj <- AddMetaData(seurat_obj, 
                             metadata = ifelse(
-                              Cells(seurat_obj) %in% cells_assignment[[genesig_name]]$assignment,
+                              Cells(seurat_obj) %in% active_cells,
                               "active", "inactive") %>% as.factor,
                             col.name = paste0(genesig_name, "_active"))
   
