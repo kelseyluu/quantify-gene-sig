@@ -36,9 +36,9 @@ plot_ROC <- function(metadata,
     # visualizing ROC curve and reporting AUC:
     dir.create(here(out_dir), showWarnings = FALSE)    
     if (img_format == 'png') {
-        png(here(out_dir, 'ROC.png'))
+        png(here(out_dir, paste0(genesig_name, '_ROC.png')))
     } else {
-        pdf(here(out_dir, 'ROC.pdf'))
+        pdf(here(out_dir, paste0(genesig_name, '_ROC.pdf')))
     }
 
 

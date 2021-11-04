@@ -9,16 +9,16 @@ Usage:
     quantify_gene_sig.R [options] <seurat> <genesig> <id_var> <group_var> <out_dir>
 
 Arguments:
-    seurat  path to seurat object *.RMD file containing scRNA-seq data
-    genesig  path to gene signature *.txt file, one gene name per line
-    id_var  name of column in seurat metadata indicating unique patient id
-    group_var   name of column in seurat metadata indicating treatment response groups
-    out_dir   directory to save output files 
+    seurat  Path to seurat object *.RMD file containing scRNA-seq data.
+    genesig  Path to gene signature *.txt file, one gene name per line.
+    id_var  Name of column in seurat metadata indicating unique patient id.
+    group_var   Name of column in seurat metadata indicating treatment response groups.
+    out_dir   Directory to save output files. Will be created if directory does not exist.
 
 Options:
     -h, --help  Show help screen.
     -v, --version  Show version.
-    -n, --name=<genesig_name>   Gene signature name. [Default: gene_signature]
+    -n, --name=<genesig_name>   Gene signature name to use for output file prefixes. [Default: gene_signature]
     -r, --rankings=<cell_rankings>  Precomputed AUCell cell rankings. 
     -l, --label=<response_label>    Label denoting positive response patients (if 2 response groups). [Default: 1]
     -c, --cell_level    Output cell level plots in addition to patient level. 
@@ -26,15 +26,7 @@ Options:
 ' -> doc
 
 
-INTERACTIVE = FALSE
-if (INTERACTIVE) {
-    arguments <- docopt(doc, version = 'gene_signature_quantification v1.0\n\n',
-                        args = c('./data/subsampled_cd3min.RDS', './data/genesig.txt', 'abbr_group'))
-
-    arguments
-} else {
-    arguments <- docopt(doc, version = 'gene_signature_quantification v1.0\n\n')
-}
+arguments <- docopt(doc, version = 'gene_signature_quantification v1.0\n\n')
 
 
 # load required packages and scripts
@@ -76,6 +68,8 @@ tic('Done')
     n_cells <- length(Cells(seurat_obj))
     response_groups <- unique(seurat_obj@meta.data[[arguments$group_var]])
     n_groups <- length(response_groups)
+    combs_df <- t(combn(response_groups %>% as.character(), 2))
+    comparisons <- split(combs_df, seq(nrow(combs_df)))
 
     cat(paste('Read Seurat object with', n_cells, 'cells and', n_groups, 'response groups:',  paste(response_groups, collapse = ', '), '\n'))
 
@@ -101,6 +95,7 @@ tic('Done')
                     arguments$name,
                     arguments$group_var,
                     arguments$id_var,
+                    comparisons,
                     arguments$cell_level,
                     arguments$format,
                     arguments$out_dir)
