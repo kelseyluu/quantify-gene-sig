@@ -6,23 +6,24 @@ suppressMessages(library(docopt))
 
 'Quantify gene signature in scRNA-seq data.
 Usage:
-    quantify_gene_sig.R [options] <seurat> <genesig> <id_var> <group_var> <out_dir>
+    quantify_gene_sig.R [options] <seurat> <genesig> <out_dir>
 
 Arguments:
     seurat  Path to seurat object *.RMD file containing scRNA-seq data.
     genesig  Path to gene signature *.txt file, one gene name per line.
-    id_var  Name of column in seurat metadata indicating unique patient id.
-    group_var   Name of column in seurat metadata indicating treatment response groups.
     out_dir   Directory to save output files. Will be created if directory does not exist.
 
 Options:
+    -i, --id=<id_var>   Name of column in seurat metadata indicating unique patient id. [Default: id]
+    -r, --response=<response_var>  Name of column in seurat metadata indicating treatment response groups. [Default: response]
+    -c, --cluster=<cluster_var>  Name of column in seurat metadata indication cell type clusters.
+    -n, --name=<genesig_name>   Gene signature name to use for output file prefixes. [Default: gene_signature]
+    --rankings=<cell_rankings>  Precomputed AUCell cell rankings. 
+    -l, --label=<response_label>    Label denoting positive response patients (if 2 response groups). [Default: 1]
+    --cell  Output cell level plots in addition to patient level. 
+    -f, --format=<img_format>   Format to save plots. Either png or pdf. [Default: png]
     -h, --help  Show help screen.
     -v, --version  Show version.
-    -n, --name=<genesig_name>   Gene signature name to use for output file prefixes. [Default: gene_signature]
-    -r, --rankings=<cell_rankings>  Precomputed AUCell cell rankings. 
-    -l, --label=<response_label>    Label denoting positive response patients (if 2 response groups). [Default: 1]
-    -c, --cell_level    Output cell level plots in addition to patient level. 
-    -f, --format=<img_format>   Format to save plots. Either png or pdf. [Default: png]
 ' -> doc
 
 
@@ -66,7 +67,7 @@ tic('Done')
     }
 
     n_cells <- length(Cells(seurat_obj))
-    response_groups <- unique(seurat_obj@meta.data[[arguments$group_var]])
+    response_groups <- unique(seurat_obj@meta.data[[arguments$response]])
     n_groups <- length(response_groups)
     combs_df <- t(combn(response_groups %>% as.character(), 2))
     comparisons <- split(combs_df, seq(nrow(combs_df)))
@@ -93,10 +94,10 @@ cat('Generating plots...\n')
 tic('Done')
     response_boxplot(seurat_obj@meta.data,
                     arguments$name,
-                    arguments$group_var,
-                    arguments$id_var,
+                    arguments$response,
+                    arguments$id,
                     comparisons,
-                    arguments$cell_level,
+                    arguments$cell,
                     arguments$format,
                     arguments$out_dir)
 
@@ -104,7 +105,8 @@ tic('Done')
     if (!is.null(seurat_obj@reductions$umap)) {
         genesig_UMAP(seurat_obj, 
                     arguments$name,
-                    arguments$group_var,
+                    arguments$response,
+                    arguments$cluster,
                     arguments$format,
                     arguments$out_dir)
     }
@@ -114,11 +116,11 @@ tic('Done')
         plot_ROC(seurat_obj@meta.data,
                 arguments$name,
                 arguments$label,
-                arguments$group_var,
+                arguments$response,
                 arguments$format,
                 arguments$out_dir,
-                arguments$cell_level,
-                arguments$id_var)
+                arguments$cell,
+                arguments$id)
     }
 
 toc()

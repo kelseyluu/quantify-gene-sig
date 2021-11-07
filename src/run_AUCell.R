@@ -1,4 +1,4 @@
-run_AUCell <- function(seurat_obj, geneSet, cells_rankings=NULL) {
+run_AUCell <- function(seurat_obj, geneSet, cells_rankings) {
   genesig_name <- names(geneSet)
   
   # rank genes by expression in each cell:
@@ -30,9 +30,10 @@ run_AUCell <- function(seurat_obj, geneSet, cells_rankings=NULL) {
   
   # add genesig binary active status to seurat metadata
   seurat_obj <- AddMetaData(seurat_obj, 
-                            metadata = ifelse(
+                            metadata = factor(ifelse(
                               Cells(seurat_obj) %in% active_cells,
-                              "active", "inactive") %>% as.factor,
+                              "active", "inactive"), 
+                              levels=c('active', 'inactive')),
                             col.name = paste0(genesig_name, "_active"))
   
   return(seurat_obj)
