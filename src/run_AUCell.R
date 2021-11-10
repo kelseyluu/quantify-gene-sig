@@ -1,4 +1,9 @@
-run_AUCell <- function(seurat_obj, geneSet, cells_rankings) {
+run_AUCell <- function(seurat_obj, 
+                       geneSet, 
+                       cells_rankings,
+                       save_data,
+                       out_dir) {
+                         
   genesig_name <- names(geneSet)
   
   # rank genes by expression in each cell:
@@ -24,9 +29,10 @@ run_AUCell <- function(seurat_obj, geneSet, cells_rankings) {
   genesig_scores <- getAUC(cells_AUC)
   
   # add genesig scores to seurat metadata
+  sig_name <- paste0(genesig_name, "_sig_score")
   seurat_obj <- AddMetaData(seurat_obj, 
                             t(genesig_scores),
-                            col.name = paste0(genesig_name, "_sig_score"))
+                            col.name = sig_name)
   
   # add genesig binary active status to seurat metadata
   seurat_obj <- AddMetaData(seurat_obj, 
@@ -36,5 +42,13 @@ run_AUCell <- function(seurat_obj, geneSet, cells_rankings) {
                               levels=c('active', 'inactive')),
                             col.name = paste0(genesig_name, "_active"))
   
+  if (save_data) {
+    dir.create(here(out_dir), showWarnings = FALSE)
+    seurat_obj@meta.data %>% 
+    select(all_of(sig_name)) %>% 
+    write.csv(here(out_dir, paste0(sig_name, 's.csv')))
+  }
+
+
   return(seurat_obj)
 }

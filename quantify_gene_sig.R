@@ -16,12 +16,13 @@ Arguments:
 Options:
     -i, --id=<id_var>   Name of column in seurat metadata indicating unique patient id. [Default: id]
     -r, --response=<response_var>  Name of column in seurat metadata indicating treatment response groups. [Default: response]
-    -c, --cluster=<cluster_var>  Name of column in seurat metadata indication cell type clusters.
+    -c, --cluster=<cluster_var>  Name of column in seurat metadata indicating cell type clusters.
     -n, --name=<genesig_name>   Gene signature name to use for output file prefixes. [Default: gene_signature]
     --rankings=<cell_rankings>  Precomputed AUCell cell rankings. 
     -l, --label=<response_label>    Label denoting positive response patients (if 2 response groups). [Default: 1]
     --cell  Output cell level plots in addition to patient level. 
     -f, --format=<img_format>   Format to save plots. Either png or pdf. [Default: png]
+    --save_data   Export gene signature scores.
     -h, --help  Show help screen.
     -v, --version  Show version.
 ' -> doc
@@ -85,7 +86,7 @@ div()
 
 cat('Quantifying signature...\n')
 tic('Done')
-    seurat_obj <- run_AUCell(seurat_obj, genesig, cells_rankings) 
+    seurat_obj <- run_AUCell(seurat_obj, genesig, cells_rankings, arguments$save_data, arguments$out_dir) 
 toc()
 div()
 
