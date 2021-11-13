@@ -78,14 +78,15 @@ predict_response <- function(metadata,
                              genesig_name,
                              id_var, 
                              out_dir,
-                             save_data) {
+                             save_data, 
+                             thresh) {
 
     genesig_var <- paste0(genesig_name, "_sig_score")
 
     patient_summary <- metadata %>% group_by(patient_id=get(id_var)) %>%
     summarise(avg_genesig = mean(get(genesig_var))) %>%
     mutate(zscore = (avg_genesig - mean(avg_genesig)) / sd(avg_genesig),
-        pred_response = ifelse(zscore > thresh, 0, 1))  
+            pred_response = ifelse(zscore > thresh, 0, 1))  
     
     if (save_data) {
         dir.create(here(out_dir), showWarnings = FALSE)  

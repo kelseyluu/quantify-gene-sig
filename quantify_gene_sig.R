@@ -44,10 +44,10 @@ suppressMessages(library(pROC))
 suppressMessages(library(caret))
 suppressMessages(library(ggpubr))
 
+
 source('./src/run_AUCell.R')
 source('./src/response_boxplot.R')
 source('./src/genesig_UMAP.R')
-# source('./src/plot_ROC.R')
 source('./src/predict_response.R')
 
 div <- function() {
@@ -70,9 +70,9 @@ tic('Done')
     } else {
         cells_rankings <- NULL
     }
+    n_cells <- length(Cells(seurat_obj))
 
     if (!is.null(arguments$response)) {
-        n_cells <- length(Cells(seurat_obj))
         response_groups <- unique(seurat_obj@meta.data[[arguments$response]])
         n_groups <- length(response_groups)
         combs_df <- t(combn(response_groups %>% as.character(), 2))
@@ -101,7 +101,7 @@ div()
 
 
 if (!is.null(arguments$response)) {
-    cat('Generating plots...\n')
+    cat('Evaluating classifier performance...\n')
     tic('Done')
         response_boxplot(seurat_obj@meta.data,
                         arguments$name,
@@ -133,7 +133,7 @@ if (!is.null(arguments$response)) {
                     arguments$format,
                     arguments$out_dir,
                     arguments$save_data,
-                    arguments$thresh
+                    as.numeric(arguments$thresh)
                     )
         }
 
@@ -146,7 +146,8 @@ if (!is.null(arguments$response)) {
             arguments$name,
             arguments$id,
             arguments$out_dir,
-            arguments$save_data
+            arguments$save_data,
+            arguments$thresh
             )
     toc()
 }
