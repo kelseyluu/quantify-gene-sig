@@ -3,6 +3,7 @@ response_boxplot <- function(metadata,
                             group_colname,
                             id_colname,
                             comparisons,
+                            wilcox_dir,
                             cell_level,
                             img_format,
                             out_dir
@@ -25,15 +26,14 @@ response_boxplot <- function(metadata,
   response_df %>% 
     ggplot(aes(x=get(group_colname), y=avg_geneSig_score, fill=get(group_colname))) +
       geom_boxplot(outlier.shape = NA) +
-      geom_jitter(color="black", size=1.5) +
+      geom_jitter(color="black", size=2) +
       stat_compare_means(aes(label = paste0("p = ", ..p.format..)),
                          comparisons = comparisons, 
                          method = "wilcox.test", 
-                         method.args = list(alternative = 'two.sided'), 
-                         size = 4.5) + 
-      theme_classic(base_size = 18) +
-      labs(title=paste(genesig_name, 'patient level boxplots'),
-          x=NULL,
+                         method.args = list(alternative = wilcox_dir), 
+                         size = 7) + 
+      theme_classic(base_size = 28) +
+      labs(x=NULL,
           y='average gene signature score') +
       NoLegend()
 
@@ -55,12 +55,11 @@ response_boxplot <- function(metadata,
         stat_compare_means(aes(label = paste0("p = ", ..p.format..)),
                           comparisons = comparisons, 
                           method = "wilcox.test", 
-                          method.args = list(alternative = 'two.sided'), 
-                          size = 4.5) +
-        theme_classic(base_size = 18) +
+                          method.args = list(alternative = wilcox_dir), 
+                          size = 7) +
+        theme_classic(base_size = 28) +
         NoLegend() + 
-        labs(title=paste(genesig_name, 'cell level violin plot'), 
-            x=NULL,
+        labs(x=NULL,
             y='gene signature score')
 
 
